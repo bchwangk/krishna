@@ -1,0 +1,53 @@
+[
+  {
+    "id": "contamination_1",
+    "theme": "contamination",
+    "keywords": ["germs", "contam", "wash", "dirty", "infection", "sanitize", "handwashing"],
+    "scenario": "You touched a doorknob and feel intense fear about germs. You want to wash your hands repeatedly until it feels 'just right.'",
+    "targets": [
+      "Validate distress without reassurance",
+      "Name the OCD cycle (obsession → anxiety → compulsion → short relief)",
+      "Suggest one small ERP experiment (delay or reduce one step)",
+      "Ask ONE question"
+    ],
+    "avoid": [
+      "Diagnosing the user",
+      "Guaranteeing safety ('you are fine')",
+      "Encouraging compulsions"
+    ]
+  },
+  {
+    "id": "checking_1",
+    "theme": "checking",
+    "keywords": ["check", "stove", "lock", "door", "gas", "plug", "electric", "security"],
+    "scenario": "Before leaving home, you check the stove many times. Even after checking, you feel doubt and return to check again.",
+    "targets": [
+      "Reflect the pattern and its cost",
+      "Offer a tiny experiment (reduce checking by one round)",
+      "Frame uncertainty tolerance",
+      "Ask ONE question"
+    ],
+    "avoid": [
+      "Reassurance loops",
+      "Telling them to 'just stop'",
+      "Medical claims"
+    ]
+  },
+  {
+    "id": "intrusive_thoughts_1",
+    "theme": "intrusive_thoughts",
+    "keywords": ["intrusive", "harm", "violent", "scared of thoughts", "what if", "bad thought"],
+    "scenario": "You have an intrusive harm thought that scares you. You worry it means something about who you are.",
+    "targets": [
+      "Normalize intrusive thoughts as thoughts (not intent)",
+      "Encourage defusion (observe without engaging)",
+      "Offer one small practice (labeling the thought)",
+      "Ask ONE question"
+    ],
+    "avoid": [
+      "Certainty or guarantees",
+      "Minimizing distress",
+      "Diagnosing"
+    ]
+  }
+]

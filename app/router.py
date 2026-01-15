@@ -8,6 +8,7 @@ class SessionState:
     state: str = "INTAKE"
     turns: int = 0
     goal: Optional[str] = None
+    vignette_id: Optional[str] = None
 
 def next_state(session: SessionState) -> None:
     # Intake a statement to intialize a goal

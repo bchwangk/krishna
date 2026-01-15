@@ -1,15 +1,16 @@
 from app.config import USE_MOCK_MODEL
-from app.llm import mock_response
 from app.router import SessionState, next_state
 from app.prompt import state_intro
+from app.vignettes import load_vignettes, pick_vignette
+from app.llm import mock_response
 
 def main():
     print("Krishnamurti (CLI) — OCD-informed CBT/ERP support (not diagnosis).")
     print("Type /quit to exit.\n")
 
     session = SessionState()
+    vignettes = load_vignettes()
 
-    # initial prompt for intake
     print(f"Krishnamurti: {state_intro(session.state)}\n")
 
     while True:
@@ -23,19 +24,27 @@ def main():
         if session.state == "GOAL" and session.goal is None:
             session.goal = user
 
+        if session.vignette_id is None:
+            v = pick_vignette(user, vignettes)
+            if v:
+                session.vignette_id = v["id"]
+
+        vignette = None
+        if session.vignette_id:
+            vignette = next((x for x in vignettes if x["id"] == session.vignette_id), None)
+
         if USE_MOCK_MODEL:
-            assistant_text = mock_response(user)
+            assistant_text = mock_response(user, session.state, vignette, session.goal)
         else:
             raise RuntimeError("Real LLM mode not enabled yet")
 
         print(f"\nKrishnamurti ({session.state}): {assistant_text}\n")
 
-        # Update turn count and advance state if needed
         session.turns += 1
+        prev_state = session.state
         next_state(session)
 
-        # After state transitions, print a guiding prompt once
-        if session.turns in (1, 2, 6):  
+        if session.state != prev_state:
             print(f"Krishnamurti: {state_intro(session.state)}\n")
 
 if __name__ == "__main__":
