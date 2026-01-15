@@ -11,7 +11,9 @@ def main():
     session = SessionState()
     vignettes = load_vignettes()
 
-    print(f"Krishnamurti: {state_intro(session.state)}\n")
+    pending_intro_text = state_intro(session.state)
+    print(f"Krishnamurti ({session.state}): {pending_intro_text}\n")
+    pending_intro_text = None
 
     while True:
         user = input("You: ").strip()
@@ -33,6 +35,11 @@ def main():
         if session.vignette_id:
             vignette = next((x for x in vignettes if x["id"] == session.vignette_id), None)
 
+        if pending_intro_text:
+            print(f"\nKrishnamurti ({session.state}): {pending_intro_text}\n")
+            pending_intro_text = None
+            continue  # wait for next user input
+
         if USE_MOCK_MODEL:
             assistant_text = mock_response(user, session.state, vignette, session.goal)
         else:
@@ -45,7 +52,7 @@ def main():
         next_state(session)
 
         if session.state != prev_state:
-            print(f"Krishnamurti: {state_intro(session.state)}\n")
+            pending_intro_text = state_intro(session.state)
 
 if __name__ == "__main__":
     main()

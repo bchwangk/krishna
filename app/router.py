@@ -5,18 +5,18 @@ STATES = ("INTAKE", "GOAL", "WORK", "WRAP")
 
 @dataclass
 class SessionState:
-    state: str = "INTAKE"
+    state: str = "INTAKE" #start with INTAKE as base state
     turns: int = 0
     goal: Optional[str] = None
     vignette_id: Optional[str] = None
 
 def next_state(session: SessionState) -> None:
     # Intake a statement to intialize a goal
-    if session.state == "INTAKE" and session.turns >= 1: 
+    if session.state == "INTAKE" and session.turns >= 1: #If current state is INTAKE and session turn is 1 or more, shift it to GOAL
         session.state = "GOAL"
 
     # Once goal receives confirmation, shift to work
-    elif session.state == "GOAL" and session.turns >= 2:
+    elif session.state == "GOAL" and session.turns >= 2: 
         session.state = "WORK"
     
     # After 6 turns (will change later), finish session
