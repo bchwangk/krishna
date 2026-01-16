@@ -16,16 +16,18 @@ def main():
     pending_intro_text = None
 
     while True:
+        if pending_intro_text:
+            print(f"\nKrishnamurti ({session.state}): {pending_intro_text}\n")
+            pending_intro_text = None
+
         user = input("You: ").strip()
         if not user:
             continue
         if user.lower() == "/quit":
             print("Krishnamurti: Take care.")
             break
-
-        if session.state == "GOAL" and session.goal is None:
-            session.goal = user
-
+        
+        # vignette selection
         if session.vignette_id is None:
             v = pick_vignette(user, vignettes)
             if v:
@@ -35,22 +37,70 @@ def main():
         if session.vignette_id:
             vignette = next((x for x in vignettes if x["id"] == session.vignette_id), None)
 
-        if pending_intro_text:
-            print(f"\nKrishnamurti ({session.state}): {pending_intro_text}\n")
-            pending_intro_text = None
-            continue  # wait for next user input
+        # capture goal
+        if session.state == "GOAL" and session.goal is None:
+            session.goal = user
+            session.awaiting_goal = False
 
+            session.turns += 1
+            prev_state = session.state
+            next_state(session)
+            if session.state != prev_state:
+                pending_intro_text = state_intro(session.state)
+            continue
+
+        # capture trigger
+        if session.state == "WORK" and session.trigger is None:
+            session.trigger = user
+
+            if (
+                session.state == "WORK"
+                and session.trigger is not None
+                and vignette
+                and not session.erp_done
+            ):
+                from app.erp import erp_plan
+
+                assistant_text = erp_plan(vignette, session.goal, session.trigger)
+                session.erp_done = True
+
+                print(f"\nKrishnamurti ({session.state}): {assistant_text}\n")
+
+                session.turns += 1
+                session.state_turns += 1
+                prev_state = session.state
+                next_state(session)
+                if session.state != prev_state:
+                    pending_intro_text = state_intro(session.state)
+                    continue
+                
+            if USE_MOCK_MODEL:
+                assistant_text = mock_response("", session.state, vignette, session.goal, session.trigger)
+            else:
+                raise RuntimeError("Real LLM mode not enabled yet")
+
+            print(f"\nKrishnamurti ({session.state}): {assistant_text}\n")
+
+            session.turns += 1
+            session.state_turns += 1
+            prev_state = session.state
+            next_state(session)
+            if session.state != prev_state:
+                pending_intro_text = state_intro(session.state)
+            continue
+
+        # generate assistant response
         if USE_MOCK_MODEL:
-            assistant_text = mock_response(user, session.state, vignette, session.goal)
+            assistant_text = mock_response(user, session.state, vignette, session.goal, session.trigger)
         else:
             raise RuntimeError("Real LLM mode not enabled yet")
 
         print(f"\nKrishnamurti ({session.state}): {assistant_text}\n")
 
         session.turns += 1
+        session.state_turns += 1
         prev_state = session.state
         next_state(session)
-
         if session.state != prev_state:
             pending_intro_text = state_intro(session.state)
 
